@@ -22,7 +22,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.SegmentedButtonDefaults.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -36,15 +35,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.wnapp.trustmoney.data.model.RequestFormData
-import com.wnapp.trustmoney.ui.theme.TBL_Green_Dark
+import com.wnapp.trustmoney.data.model.RegistrationFormData
+import com.wnapp.trustmoney.ui.theme.BrandGreen
 import com.wnapp.trustmoney.ui.theme.White
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ForgotCredentialsScreen(onBack: () -> Unit) {
     var resetType by remember { mutableStateOf("Account") } // Account or Card
-    var formData by remember { mutableStateOf(RequestFormData()) } // আগের তৈরি করা মডেল ব্যবহার করতে পারেন
+    var formData by remember { mutableStateOf(RegistrationFormData()) } // আগের তৈরি করা মডেল ব্যবহার করতে পারেন
     var expanded by remember { mutableStateOf(false) }
 
     Column(
@@ -56,7 +55,7 @@ fun ForgotCredentialsScreen(onBack: () -> Unit) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(TBL_Green_Dark)
+                .background(BrandGreen)
                 .padding(top = 40.dp, bottom = 20.dp, start = 16.dp, end = 16.dp)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -89,16 +88,6 @@ fun ForgotCredentialsScreen(onBack: () -> Unit) {
 
             Spacer(modifier = Modifier.height(25.dp))
 
-            // ৩. ইনপুট ফিল্ডস
-            OutlinedTextField(
-                value = formData.uniqueField,
-                onValueChange = { formData = formData.copy(uniqueField = it) },
-                placeholder = { Text("Enter your ${resetType.lowercase()} number") },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(8.dp),
-                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = TBL_Green_Dark)
-            )
-
             Spacer(modifier = Modifier.height(15.dp))
 
             OutlinedTextField(
@@ -107,7 +96,7 @@ fun ForgotCredentialsScreen(onBack: () -> Unit) {
                 placeholder = { Text("Enter your registered number") },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(8.dp),
-                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = TBL_Green_Dark)
+                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BrandGreen)
             )
 
             Spacer(modifier = Modifier.height(15.dp))
@@ -118,7 +107,7 @@ fun ForgotCredentialsScreen(onBack: () -> Unit) {
                 placeholder = { Text("Enter your registered email") },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(8.dp),
-                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = TBL_Green_Dark)
+                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BrandGreen)
             )
 
             Spacer(modifier = Modifier.height(15.dp))
@@ -126,7 +115,7 @@ fun ForgotCredentialsScreen(onBack: () -> Unit) {
             // ৪. সিকিউরিটি কোশ্চেন ড্রপডাউন (সংক্ষেপে)
             Box {
                 OutlinedTextField(
-                    value = formData.securityQuestion,
+                    value = formData.firstName,
                     onValueChange = {},
                     readOnly = true,
                     placeholder = { Text("Security Question") },
@@ -141,18 +130,12 @@ fun ForgotCredentialsScreen(onBack: () -> Unit) {
                 text = "Forgot security question?",
                 modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
                 textAlign = TextAlign.End,
-                color = TBL_Green_Dark,
+                color = BrandGreen,
                 fontWeight = FontWeight.Bold,
                 fontSize = 14.sp
             )
 
-            OutlinedTextField(
-                value = formData.securityAnswer,
-                onValueChange = { formData = formData.copy(securityAnswer = it) },
-                placeholder = { Text("Security answer") },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(8.dp)
-            )
+
         }
     }
 }
@@ -165,7 +148,7 @@ fun CustomToggleSwitch(selectedOption: String, onOptionSelected: (String) -> Uni
         modifier = Modifier
             .fillMaxWidth(0.6f)
             .height(45.dp)
-            .border(1.dp, TBL_Green_Dark, RoundedCornerShape(25.dp))
+            .border(1.dp, BrandGreen, RoundedCornerShape(25.dp))
 
     ) {
         Box(
@@ -173,26 +156,28 @@ fun CustomToggleSwitch(selectedOption: String, onOptionSelected: (String) -> Uni
                 .weight(1f)
                 .fillMaxHeight()
                 .background(
-                    if (selectedOption == "Account") TBL_Green_Dark else Color.Transparent,
+                    if (selectedOption == "Account") BrandGreen else Color.Transparent,
                     RoundedCornerShape(25.dp)
                 )
                 .clickable { onOptionSelected("Account") },
             contentAlignment = Alignment.Center
         ) {
-            Text("Account", color = if (selectedOption == "Account") White else TBL_Green_Dark)
+            Text("Account", color = if (selectedOption == "Account") White else BrandGreen)
         }
         Box(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxHeight()
                 .background(
-                    if (selectedOption == "Card") TBL_Green_Dark else Color.Transparent,
+                    if (selectedOption == "Card") BrandGreen else Color.Transparent,
                     RoundedCornerShape(25.dp)
                 )
                 .clickable { onOptionSelected("Card") },
             contentAlignment = Alignment.Center
         ) {
-            Text("Card", color = if (selectedOption == "Card") White else TBL_Green_Dark)
+
+
+            Text("Card", color = if (selectedOption == "Card") White else BrandGreen)
         }
     }
 }

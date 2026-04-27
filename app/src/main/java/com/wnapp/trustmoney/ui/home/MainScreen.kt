@@ -122,10 +122,9 @@ fun MainScreen(mainNavController: NavHostController) {
                 3 -> MoreScreen(onMenuClick = { title ->
                     when (title) {
                         "Profile Information" -> mainNavController.navigate(Screen.Profile.route)
-                        "Upload Document" -> mainNavController.navigate(Screen.UploadDoc.route)
                         "Logout" -> {
                             // লগআউট লজিক: লগইন স্ক্রিনে পাঠিয়ে দেওয়া
-                            mainNavController.navigate(Screen.Login.route) {
+                            mainNavController.navigate(Screen.Auth.route) {
                                 popUpTo(0) // পুরো ব্যাকস্ট্যাক ক্লিয়ার করে দেওয়া (Concept: Security)
                             }
                         }
