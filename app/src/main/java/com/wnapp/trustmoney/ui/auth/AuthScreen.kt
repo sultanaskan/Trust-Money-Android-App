@@ -1,51 +1,67 @@
 package com.wnapp.trustmoney.ui.auth
 
 import android.annotation.SuppressLint
-import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
+import android.app.Activity
+import android.content.Context
+import android.widget.Toast
+import androidx.compose.animation.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+// লেটেস্ট লাইফসাইকেল এবং নেভিগেশন ইমপোর্ট
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+
+// আপনার প্রজেক্টের নিজস্ব ক্লাসগুলো
 import com.wnapp.trustmoney.R
+import com.wnapp.trustmoney.data.local.getSavedLocale
+import com.wnapp.trustmoney.data.local.updateLocale
 import com.wnapp.trustmoney.data.repository.AuthRepository
+import com.wnapp.trustmoney.data.utils.NotificationHelper
+import com.wnapp.trustmoney.ui.navigation.Screen
 import com.wnapp.trustmoney.ui.theme.*
-import com.wnapp.trustmoney.ui.viewmodel.AuthViewModel
-import com.wnapp.trustmoney.ui.viewmodel.AuthViewModelFactory
+import com.wnapp.trustmoney.viewmodel.AuthViewModel
+import com.wnapp.trustmoney.viewmodel.AuthViewModelFactory
+import java.util.Locale
+
+var generatedOtp by androidx.compose.runtime.mutableStateOf("")
+var showOtpDialog by mutableStateOf(false)
+var otpVerified by mutableStateOf(false)
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun AuthScreen(navController: NavController) {
-    var selectedTab by remember { mutableStateOf(0) }
+    val context = LocalContext.current
+    val currentLang = remember { getSavedLocale(context) } // বর্তমানে 'en' না কি 'bn' তা চেক করবে
+    var selectedTab by remember { mutableIntStateOf(0) }
     val uriHandler = LocalUriHandler.current
-    val repository = AuthRepository()
+    val repository = AuthRepository(context)
     val authViewModel: AuthViewModel = viewModel(
-        factory = AuthViewModelFactory(repository) // ফ্যাক্টরি ব্যবহার করা জরুরি
+        factory = AuthViewModelFactory(repository)
     )
-
-
     Box(modifier = Modifier.fillMaxSize().background(Color.White)) {
         // 1. Background Image
         Image(
@@ -54,16 +70,81 @@ fun AuthScreen(navController: NavController) {
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.FillBounds
         )
+
+        // সমস্ত কন্টেন্ট একটি Column এ রাখা হয়েছে যেন বাটন ওভারল্যাপ না হয়
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 25.dp)
-                // Use animateContentSize so the scroll container handles height changes smoothly
                 .animateContentSize()
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(55.dp))
+            // --- ল্যাঙ্গুয়েজ সুইচ বাটন ---
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 40.dp),
+                contentAlignment = Alignment.TopEnd
+            ) {
+                Row(
+                    modifier = Modifier
+                        .width(100.dp)
+                        .height(38.dp)
+                        .clip(RoundedCornerShape(19.dp))
+                        .background(Color.White.copy(alpha = 0.5f))
+                        .border(1.dp, TBL_Green_Dark.copy(alpha = 0.6f), RoundedCornerShape(19.dp)),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
+                    // বাংলা বাটন
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
+                            .background(if (currentLang.startsWith("bn")) TBL_Green_Dark else Color.Transparent)
+                            .clickable {
+                                if (!currentLang.startsWith("bn")) {
+                                    Toast.makeText(context, "বাংলা সেট হচ্ছে...", Toast.LENGTH_SHORT).show()
+                                    updateLocale(context, "bn")
+                                }
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "বাং",
+                            color = if (currentLang.startsWith("bn")) Color.White else TBL_Green_Dark,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
+                // English বাটন
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
+                            .background(if (currentLang.startsWith("en")) TBL_Green_Dark else Color.Transparent)
+                            .clickable {
+                                 // যদি ভাষা বাংলা থাকে (অর্থাৎ 'en' দিয়ে শুরু না হয়), তবেই ইংলিশ সেট হবে
+                                if (!currentLang.startsWith("en")) {
+                                    Toast.makeText(context, "Setting English...", Toast.LENGTH_SHORT).show()
+                                    updateLocale(context, "en")
+                                }
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "EN",
+                            color = if (currentLang.startsWith("en")) Color.White else TBL_Green_Dark,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(30.dp))
 
             // 2. Logo
             Image(
@@ -71,8 +152,10 @@ fun AuthScreen(navController: NavController) {
                 contentDescription = null,
                 modifier = Modifier.width(170.dp).height(85.dp)
             )
+
             Spacer(modifier = Modifier.height(45.dp))
-            // 3. Tab Switch
+
+            // 3. Tab Switch (Login / New Request)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -80,61 +163,92 @@ fun AuthScreen(navController: NavController) {
                     .border(1.dp, TBL_Green_Dark, RoundedCornerShape(26.dp))
                     .padding(2.dp)
             ) {
-                TabButton("Login", selectedTab == 0, Modifier.weight(1f)) {
+                TabButton(stringResource(R.string.login_label), selectedTab == 0, Modifier.weight(1f)) {
                     selectedTab = 0
                 }
-                TabButton("New user Request", selectedTab == 1, Modifier.weight(1.4f)) {
+                TabButton(stringResource(R.string.new_user_request), selectedTab == 1, Modifier.weight(1.4f)) {
                     selectedTab = 1
                 }
             }
+
             Spacer(modifier = Modifier.height(35.dp))
 
-            // 4. Content Switching (Fixed)
-            androidx.compose.animation.AnimatedContent(
-                targetState = selectedTab,
-                transitionSpec = {
-                    fadeIn(animationSpec = tween(300)) togetherWith fadeOut(animationSpec = tween(300))
-                },
-                label = "TabTransition"
-            ) { targetTab ->
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    if (targetTab == 0) {
-                        // LoginForm-এ viewModel প্যারামিটারটি যুক্ত করা হয়েছে
-                        LoginForm(
-                            navController = navController,
-                            viewModel = authViewModel
-                        )
-                    } else {
-                        RegistrationForm(
-                            navController = navController,
-                            viewModel = authViewModel,
-                            onRegistrationSuccess = {
-                                selectedTab = 0 // রেজিস্ট্রেশন সফল হলে লগইন ট্যাবে নিয়ে যাবে
-                            }
-                        )
-                    }
-                }
+            // 4. Forms
+            AnimatedContent(targetState = selectedTab, label = "TabTransition") { targetTab ->
+                if (targetTab == 0) LoginForm(navController, authViewModel, context, {triggerOtpProcess(context)})
+                else RegistrationForm(navController, authViewModel, ) { triggerOtpProcess(context) }
             }
 
-
-            // ... (Rest of your code for BottomServiceCards)
             Spacer(modifier = Modifier.height(50.dp))
+
+            // Bottom Services
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                BottomServiceCard(Modifier.weight(1f).clickable{uriHandler.openUri("https://ekyc.tblbd.com")}, Icons.Outlined.PersonAdd, "Open an\naccount")
-                BottomServiceCard(Modifier.weight(1f), Icons.Outlined.LocationOn, "Nearby\nBR/ATM")
-                BottomServiceCard(Modifier.weight(1f), Icons.Outlined.BusinessCenter, "Services\n& Help")
+                BottomServiceCard(Modifier.weight(1f).clickable { uriHandler.openUri("https://ekyc.tblbd.com") }, Icons.Outlined.PersonAdd, stringResource(R.string.open_account))
+                BottomServiceCard(Modifier.weight(1f), Icons.Outlined.LocationOn, stringResource(R.string.nearby_atm))
+                BottomServiceCard(Modifier.weight(1f), Icons.Outlined.BusinessCenter, stringResource(R.string.services_help))
             }
+
             Spacer(modifier = Modifier.height(60.dp))
-            Text("Version 6.0", color = TBL_Green_Dark, fontSize = 13.sp, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.End)
+            Text(
+                text = "${stringResource(R.string.version)} 6.0",
+                color = TBL_Green_Dark,
+                fontSize = 13.sp,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.End
+            )
         }
     }
+    if (showOtpDialog) {
+        var otpInput by remember { androidx.compose.runtime.mutableStateOf("") }
+        var isError by remember { mutableStateOf(false) }
+
+        AlertDialog(
+            onDismissRequest = { }, // বাইরে ক্লিক করলে বন্ধ হবে না
+            title = { Text("Verify OTP", fontWeight = FontWeight.Bold) },
+            text = {
+                Column {
+                    Text("We've sent an OTP to your notification bar.")
+                    Spacer(modifier = Modifier.height(10.dp))
+                    OutlinedTextField(
+                        value = otpInput,
+                        onValueChange = {
+                            if (it.length <= 6) otpInput = it
+                            isError = false
+                        },
+                        label = { Text("Enter 6-digit OTP") },
+                        isError = isError,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    if (isError) {
+                        Text("Invalid OTP, please try again", color = Color.Red, fontSize = 12.sp)
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        if (verifyOtp(otpInput)) {
+                            if(selectedTab == 1){
+                                selectedTab = 0
+                            }else{
+                                navController.navigate(Screen.Dashboard.route)
+                            }
+                        } else {
+                            isError = true
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = TBL_Green_Dark)
+                ) {
+                    Text("Verify")
+                }
+            }
+        )
+    }
+
+
+
 }
-
-
-
-
-
-
 @Composable
 fun TabButton(text: String, isSelected: Boolean, modifier: Modifier, onClick: () -> Unit) {
     Surface(
@@ -145,7 +259,7 @@ fun TabButton(text: String, isSelected: Boolean, modifier: Modifier, onClick: ()
         Box(contentAlignment = Alignment.Center) {
             Text(
                 text = text,
-                color = if (isSelected) White else TBL_Green_Dark,
+                color = if (isSelected) Color.White else TBL_Green_Dark,
                 fontSize = 15.sp,
                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
             )
@@ -153,43 +267,46 @@ fun TabButton(text: String, isSelected: Boolean, modifier: Modifier, onClick: ()
     }
 }
 
-
 @Composable
-fun BottomServiceCard(
-    modifier: Modifier,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    title: String
-) {
+fun BottomServiceCard(modifier: Modifier, icon: androidx.compose.ui.graphics.vector.ImageVector, title: String) {
     Card(
         modifier = modifier.height(85.dp),
-        colors = CardDefaults.cardColors(containerColor = White),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
         border = BorderStroke(1.dp, BrandGreen),
         shape = RoundedCornerShape(10.dp)
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(8.dp),
+            modifier = Modifier.fillMaxSize().padding(8.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = BrandGreen,
-                modifier = Modifier.size(26.dp)
-            )
+            Icon(imageVector = icon, contentDescription = null, tint = BrandGreen, modifier = Modifier.size(26.dp))
             Spacer(modifier = Modifier.width(6.dp))
-            Text(
-                text = title,
-                fontSize = 11.sp,
-                color = BrandGreen,
-                fontWeight = FontWeight.Bold,
-                lineHeight = 14.sp
-            )
+            Text(text = title, fontSize = 11.sp, color = BrandGreen, fontWeight = FontWeight.Bold, lineHeight = 14.sp)
         }
     }
 }
+
+
+
+// ===========OTP Process ==================
+fun triggerOtpProcess(context: Context){
+    val random = java.security.SecureRandom()
+    generatedOtp = (100000 + random.nextInt(900000)).toString()
+    NotificationHelper(context).sendOtpNotification(generatedOtp)
+    showOtpDialog = true
+}
+
+fun verifyOtp(userInput: String): Boolean {
+    return if (userInput == generatedOtp) {
+        otpVerified = true
+        showOtpDialog = false
+        true
+    } else {
+        false
+    }
+}
+
 
 
 
@@ -197,25 +314,7 @@ fun BottomServiceCard(
 @SuppressLint("ViewModelConstructorInComposable")
 @Preview(showBackground = true)
 @Composable
-fun LoginFormPreview() {
-    NECMoneyTheme {
-        LoginForm(navController = rememberNavController(), viewModel = AuthViewModel(AuthRepository()))
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun RegistrationFormPreview() {
-    // ১. একটি ডামি রিপোজিটরি (যদি সম্ভব হয়)
-    val repository = AuthRepository()
-    val authViewModel: AuthViewModel = viewModel(
-        factory = AuthViewModelFactory(repository) // ফ্যাক্টরি ব্যবহার করা জরুরি
-    )
-    NECMoneyTheme {
-        RegistrationForm(
-            navController = rememberNavController(),
-            viewModel = authViewModel,
-            onRegistrationSuccess = {}
-        )
-    }
+fun AuthScreenPreview() {
+    val navController = rememberNavController()
+    AuthScreen(navController)
 }

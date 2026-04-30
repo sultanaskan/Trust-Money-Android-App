@@ -1,5 +1,8 @@
 package com.wnapp.trustmoney.ui.auth
 
+import android.annotation.SuppressLint
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -7,11 +10,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.outlined.VisibilityOff
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -28,25 +33,30 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.wnapp.trustmoney.R
 import com.wnapp.trustmoney.data.model.LoginCreds
+import com.wnapp.trustmoney.data.repository.AuthRepository
+import com.wnapp.trustmoney.data.utils.NotificationHelper
 import com.wnapp.trustmoney.ui.components.OtpVerificationDialog
 import com.wnapp.trustmoney.ui.navigation.Screen
 import com.wnapp.trustmoney.ui.theme.TBL_Green_Dark
-import com.wnapp.trustmoney.ui.theme.TextGray
-import com.wnapp.trustmoney.ui.viewmodel.AuthViewModel
+import com.wnapp.trustmoney.viewmodel.AuthViewModel
 
 
+@SuppressLint("ViewModelConstructorInComposable")
 @Composable
-fun LoginForm(navController: NavController, viewModel: AuthViewModel) {
+fun LoginForm(navController: NavController, viewModel: AuthViewModel, context: Context, onSuccess: () -> Unit) {
     var creds by remember { mutableStateOf(LoginCreds()) }
     var isPasswordVisible by remember { mutableStateOf(false) }
-    var showOtpDialog by remember { mutableStateOf(false) }
+
 
     val loginStatus by viewModel.loginStatus
     val isLoading by viewModel.isLoading
@@ -63,7 +73,7 @@ fun LoginForm(navController: NavController, viewModel: AuthViewModel) {
         OutlinedTextField(
             value = creds.email,
             onValueChange = { creds = creds.copy(email = it) },
-            label = { Text("Email", color = Color.Gray) },
+            label = { Text(stringResource(R.string.email_address_lable), color = Color.Gray) },
             modifier = Modifier.fillMaxWidth(),
             leadingIcon = { Icon(Icons.Outlined.Person, null, tint = TBL_Green_Dark) },
             shape = RoundedCornerShape(8.dp),
@@ -80,7 +90,7 @@ fun LoginForm(navController: NavController, viewModel: AuthViewModel) {
         OutlinedTextField(
             value = creds.password,
             onValueChange = { creds = creds.copy(password = it) },
-            label = { Text("Password", color = Color.Gray) },
+            label = { Text(stringResource(R.string.password_lable), color = Color.Gray) },
             modifier = Modifier.fillMaxWidth(),
             leadingIcon = { Icon(Icons.Outlined.Lock, null, tint = TBL_Green_Dark) },
             trailingIcon = {
@@ -111,7 +121,11 @@ fun LoginForm(navController: NavController, viewModel: AuthViewModel) {
 
         // Login Button
         Button(
-            onClick = { viewModel.loginUser(creds) },
+            onClick = {
+                viewModel.loginUser(creds, {
+                    onSuccess()
+                })
+            },
             modifier = Modifier.fillMaxWidth().height(55.dp),
             enabled = !isLoading,
             colors = ButtonDefaults.buttonColors(containerColor = TBL_Green_Dark),
@@ -120,26 +134,21 @@ fun LoginForm(navController: NavController, viewModel: AuthViewModel) {
             if (isLoading) {
                 CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
             } else {
-                Text("Login", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                Text(
+                    stringResource(R.string.login_label),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
             }
         }
     }
-
-    // OTP ডায়ালগ
-    if (showOtpDialog) {
-        OtpVerificationDialog(
-            onDismiss = {
-                showOtpDialog = false
-                viewModel.resetLoginStatus()
-            },
-            onVerify = { otpCode ->
-                // OTP ভেরিফাই সাকসেসফুল হলে ড্যাশবোর্ডে যাওয়া
-                showOtpDialog = false
-                viewModel.resetLoginStatus()
-                navController.navigate(Screen.Dashboard.route) {
-                    popUpTo("auth") { inclusive = true }
-                }
-            }
-        )
-    }
 }
+
+
+
+
+
+
+
+

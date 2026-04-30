@@ -122,7 +122,7 @@ fun OtpVerificationDialog(
 }
 
 @Composable
-fun OtpInputField(code: String, onValueChange: (String) -> Unit) {
+    fun OtpInputField(code: String, onValueChange: (String) -> Unit) {
     BasicTextField(
         value = code,
         onValueChange = onValueChange,

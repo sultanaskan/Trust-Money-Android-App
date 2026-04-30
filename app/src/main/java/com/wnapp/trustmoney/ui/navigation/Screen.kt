@@ -13,7 +13,6 @@ sealed class Screen(val route: String) {
     object ForgotPass : Screen("forgot_pass")
     object Dashboard: Screen("dashboard")
     object FundTransfer: Screen("fund_transfer")
-    object AddMoneyMethodSelectionScreen: Screen("add_money_method_selection_screen")
     object BillAndFeesPayerOrgSelectionScreen: Screen("bill_fees_payer_org_selection_screen")
     object CreditCardSelectionBillPayScreen: Screen("credit_card_selection_bill_pay_screen")
     object FundTransferMethodSelectionScreen: Screen("fundTransferMethodSelectionScreen")
@@ -22,6 +21,33 @@ sealed class Screen(val route: String) {
     object BeneficiaryManageSelectionScreen: Screen("beneficiary_manage_selection_screen")
     object CardServiceSelectionScreen: Screen("CardServicesSelectionScreen")
     object TransactionHistoryScreen: Screen("TransactionHistorySelectionScreen")
+    object PackageScreen: Screen("package_screen")
+    object AddMoneyMethodSelectionScreen: Screen("add_money_method_selection_screen/{amount}"){
+        fun passAmount(amount: String): String{
+            return "add_money_method_selection_screen/$amount"
+        }
+    }
+    object AddBalance: Screen("add_balance/{amount}"){
+        fun passAmount(amount: String): String{
+            return "add_balance/$amount"
+        }
+    }
+    object MoneyRequest: Screen("money_request/{amount}/{payment_type}"){
+        fun passAmountAndMethod( amount: String, payment_type:String): String{
+            return "money_request/$amount/$payment_type"
+        }
+    }
+    object PaymentSubmitMobile: Screen("payment_submit_mobile/{amount}"){
+        fun passAmount(amount: String): String{
+            return "payment_submit_mobile/$amount"
+        }
+    }
+    object PaymentSubmitBank: Screen("payment_submit_bank/{amount}"){
+        fun passAmount(amount: String): String{
+            return "payment_submit_bank/$amount"
+        }
+    }
+
 
 
 }

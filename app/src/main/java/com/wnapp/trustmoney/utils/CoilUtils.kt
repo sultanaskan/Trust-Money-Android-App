@@ -1,4 +1,4 @@
-package com.wnapp.trustmoney.util
+package com.wnapp.trustmoney.utils
 
 // ফাইল: com.wnapp.trustmoney.util.CoilUtils.kt
 import android.content.Context

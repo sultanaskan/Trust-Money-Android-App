@@ -10,9 +10,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import coil.Coil
+import com.wnapp.trustmoney.data.local.applyInitialLocale
+import com.wnapp.trustmoney.data.local.getSavedLocale
 import com.wnapp.trustmoney.ui.theme.NECMoneyTheme
 import com.wnapp.trustmoney.ui.navigation.AppNavigation
-import com.wnapp.trustmoney.util.getSvgImageLoader
+import com.wnapp.trustmoney.utils.getSvgImageLoader
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,6 +22,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
        // splashScreen.setKeepOnScreenCondition { viewModel.isLoading.value }
         enableEdgeToEdge()
+        applyInitialLocale(this, getSavedLocale(this))
         // পুরো অ্যাপের জন্য ডিফল্ট ইমেজ লোডার সেট করা
         val imageLoader = getSvgImageLoader(this)
         Coil.setImageLoader(imageLoader)

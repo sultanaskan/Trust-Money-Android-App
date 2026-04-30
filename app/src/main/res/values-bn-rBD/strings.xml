@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Trust Money</string>
+    <string name="open_account">একাউন্ট তৈরি করুন</string>
+    <string name="version">ভার্শন</string>
+    <string name="nearby_atm">"নিকটের এটিএম বুথ "</string>
+    <string name="services_help">সার্ভিস</string>
+    <string name="login_label">সাইন ইন</string>
+    <string name="new_user_request">"নতুন ইউজার রিকুয়েস্ট "</string>
+    <string name="create_account">একাউন্ট তৈরি করুন</string>
+    <string name="first_name_lable">নামের প্রথম অংশ</string>
+    <string name="last_name_lable">নামের শেষ অংশ</string>
+    <string name="phone_number_lable">"ফোন নাম্বার "</string>
+    <string name="date_of_birth_lable">জন্ম তারিখ</string>
+    <string name="password_lable">পাসওয়ার্ড</string>
+    <string name="confirm_password_lable">কনফার্ম পাসওয়ার্ড</string>
+    <string name="country_lable">দেশ</string>
+    <string name="email_address_lable">"ইমেইল এড্রেস "</string>
+</resources>

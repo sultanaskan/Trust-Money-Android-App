@@ -50,6 +50,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -57,13 +58,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.wnapp.trustmoney.R
 import com.wnapp.trustmoney.data.model.CurrencyItem
 import com.wnapp.trustmoney.data.model.RegistrationFormData
-import com.wnapp.trustmoney.ui.navigation.Screen
 import com.wnapp.trustmoney.ui.theme.TBL_Divider_Gray
 import com.wnapp.trustmoney.ui.theme.TBL_Green_Dark
-import com.wnapp.trustmoney.ui.viewmodel.AuthViewModel
-import com.wnapp.trustmoney.util.getSvgImageLoader
+import com.wnapp.trustmoney.viewmodel.AuthViewModel
+import com.wnapp.trustmoney.utils.getSvgImageLoader
 import java.util.Calendar
 
 
@@ -111,7 +112,7 @@ fun RegistrationForm(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text(
-            text = "Create Account",
+            text =  stringResource(R.string.create_account) ,
             style = MaterialTheme.typography.headlineMedium,
             color = TBL_Green_Dark,
             modifier = Modifier.padding(bottom = 16.dp)
@@ -123,18 +124,18 @@ fun RegistrationForm(
             onValueChange = { newId ->
                 formData = formData.copy(currencyId = newId) // সরাসরি ID আপডেট করুন
             },
-            label = "Country",
+            label = stringResource(R.string.country_lable),
             defaultIcon = Icons.Outlined.Flag,
             suggestions = countries,
             isLoading = isLoading,
-            onFocus = { if (countries.isEmpty()) viewModel.getCurrency() },
+            onFocus = { if (countries.isEmpty()) viewModel.getCurrencies() },
             colors = textFieldColors(TBL_Green_Dark, TBL_Divider_Gray)
         )
         // ২. First Name
         CustomTextField(
             value = formData.firstName,
             onValueChange = { formData = formData.copy(firstName = it) },
-            label = "First Name",
+            label = stringResource(R.string.first_name_lable),
             icon = Icons.Outlined.Person,
             colors = textFieldColors(TBL_Green_Dark, TBL_Divider_Gray)
         )
@@ -143,7 +144,7 @@ fun RegistrationForm(
         CustomTextField(
             value = formData.lastName,
             onValueChange = { formData = formData.copy(lastName = it) },
-            label = "Last Name",
+            label = stringResource(R.string.last_name_lable),
             icon = Icons.Outlined.Person,
             colors = textFieldColors(TBL_Green_Dark, TBL_Divider_Gray)
         )
@@ -152,7 +153,7 @@ fun RegistrationForm(
         CustomTextField(
             value = formData.phone,
             onValueChange = { formData = formData.copy(phone = it) },
-            label = "Phone Number",
+            label = stringResource(R.string.phone_number_lable),
             icon = Icons.Outlined.Phone,
             keyboardType = KeyboardType.Phone,
             colors = textFieldColors(TBL_Green_Dark, TBL_Divider_Gray)
@@ -162,7 +163,7 @@ fun RegistrationForm(
         CustomTextField(
             value = formData.email,
             onValueChange = { formData = formData.copy(email = it) },
-            label = "Email Address",
+            label = stringResource(R.string.email_address_lable),
             icon = Icons.Outlined.Email,
             keyboardType = KeyboardType.Email,
             colors = textFieldColors(TBL_Green_Dark, TBL_Divider_Gray)
@@ -174,7 +175,7 @@ fun RegistrationForm(
             CustomTextField(
                 value = formData.dateOfBirth,
                 onValueChange = { }, // সরাসরি টাইপ করা বন্ধ রাখতে খালি রাখুন
-                label = "Date of Birth",
+                label = stringResource(R.string.date_of_birth_lable),
                 icon = Icons.Outlined.CalendarMonth,
                 readOnly = true, // ইউজার যাতে কিবোর্ড দিয়ে লিখতে না পারে
                 colors = textFieldColors(TBL_Green_Dark, TBL_Divider_Gray),
@@ -195,7 +196,7 @@ fun RegistrationForm(
         CustomTextField(
             value = formData.password,
             onValueChange = { formData = formData.copy(password = it) },
-            label = "Password",
+            label = stringResource(R.string.password_lable),
             icon = Icons.Outlined.Lock,
             isPassword = true,
             colors = textFieldColors(TBL_Green_Dark, TBL_Divider_Gray)
@@ -205,7 +206,7 @@ fun RegistrationForm(
         CustomTextField(
             value = formData.confirmPassword,
             onValueChange = { formData = formData.copy(confirmPassword = it) },
-            label = "Confirm Password",
+            label = stringResource(R.string.confirm_password_lable) ,
             icon = Icons.Outlined.Lock,
             isPassword = true,
             colors = textFieldColors(TBL_Green_Dark, TBL_Divider_Gray)

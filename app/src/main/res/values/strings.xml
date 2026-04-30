@@ -1,3 +1,18 @@
 <resources>
     <string name="app_name">Trust Money</string>
+    <string name="open_account">Open an acount \n</string>
+    <string name="version">Version</string>
+    <string name="nearby_atm">NearBy BR/ATM\n</string>
+    <string name="services_help"><![CDATA[Services & Help\n]]></string>
+    <string name="login_label">Login\n</string>
+    <string name="new_user_request">"New user Request "</string>
+    <string name="create_account">Create Account</string>
+    <string name="country_lable">Country</string>
+    <string name="first_name_lable">First Name</string>
+    <string name="last_name_lable">Last Name</string>
+    <string name="phone_number_lable">Phone Number</string>
+    <string name="email_address_lable">Email Address</string>
+    <string name="date_of_birth_lable">Date of Birth</string>
+    <string name="password_lable">Password</string>
+    <string name="confirm_password_lable">Confirm Password</string>
 </resources>

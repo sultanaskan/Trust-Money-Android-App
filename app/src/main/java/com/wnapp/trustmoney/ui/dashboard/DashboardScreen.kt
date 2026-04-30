@@ -43,6 +43,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
@@ -70,6 +71,7 @@ import kotlinx.coroutines.launch
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.wnapp.trustmoney.R
+import com.wnapp.trustmoney.data.local.SessionManager
 
 // আপনার ব্র্যান্ড কালারসমূহ (যদি আলাদা ফাইলে থাকে তবে সেখান থেকে ইম্পোর্ট করুন)
 
@@ -81,9 +83,10 @@ fun DashboardScreen(navController: NavController) {
     val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState()
     var showBottomSheet by remember { mutableStateOf(false) }
-    var selectedTab by remember { mutableStateOf(1) } // Default Cards selected
+    var selectedTab by remember { mutableStateOf(0) } // Default Cards selected
     val context = LocalContext.current
     var showScanner by remember { mutableStateOf(false) }
+    val session = SessionManager(context);
     // পারমিশন হ্যান্ডলার
     val cameraPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -185,18 +188,21 @@ fun DashboardScreen(navController: NavController) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 // ১. প্রোফাইল হেডার
-                ProfileHeaderSection(userName = "MD HABIBUR RAHMAN")
+                ProfileHeaderSection(userName = session.getFullName())
 
                 // ২. ক্যাটাগরি ট্যাব বাটন
                 CategoryTabs(selectedTab = selectedTab, onTabSelected = { selectedTab = it })
 
                 // ৩. ডাইনামিক কন্টেন্ট
-                TabContentArea(selectedTab)
+                TabContentArea(selectedTab, "user")
 
-                // ৪. ড্রাগেবল মেনু ইন্ডিকেটর
-                Spacer(modifier = Modifier.height(20.dp))
-                // ১. এনিমেশন ট্রানজিশন তৈরি
+                Spacer(modifier = Modifier.height(16.dp))
 
+                DepositNowButton(
+                    onClick = {
+                        // TODO: Navigate to deposit screen
+                    }
+                )
                 val infiniteTransition = rememberInfiniteTransition(label = "iconTransition")
                 val offsetAnim by infiniteTransition.animateFloat(
                     initialValue = 0f,
@@ -609,26 +615,161 @@ fun CategoryTabs(selectedTab: Int, onTabSelected: (Int) -> Unit) {
         }
     }
 }
+
 @Composable
-fun TabContentArea(selectedTab: Int) {
+fun TabContentArea(
+    selectedTab: Int,
+    userStatus: String // "agent" or "user"
+) {
+    val isAgent = userStatus == "agent"
+
     Card(
-        modifier = Modifier.fillMaxWidth().padding(16.dp).height(200.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+            .height(200.dp),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFF004D40))
     ) {
-        Box(modifier = Modifier.fillMaxSize().padding(20.dp)) {
-            Column {
-                Text("Trust Bank PLC.", color = White, fontWeight = FontWeight.Bold)
-                Spacer(modifier = Modifier.height(20.dp))
-                Text("MD HABIBUR RAHMAN", color = White, fontSize = 18.sp)
-                Spacer(modifier = Modifier.weight(1f))
-                Text(if (selectedTab == 1) "Credit Card" else "Savings Account", color = White.copy(0.7f))
-                Text("See Balance", color = White, fontWeight = FontWeight.Bold)
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(20.dp)
+        ) {
+
+            // 🔹 Condition 1: Normal Card
+            if (selectedTab == 0) {
+                NormalCardContent()
             }
-            Icon(Icons.Default.Share, null, tint = White, modifier = Modifier.align(Alignment.CenterEnd))
+
+            // 🔹 Condition 2: Locked Card
+            else if (selectedTab == 1 && !isAgent) {
+                LockedCardContent()
+            }
+
+            // 🔹 Condition 3: Agent Dual Currency Card
+            else if (selectedTab == 1 && isAgent) {
+                AgentCardContent()
+            }
         }
     }
 }
+
+@Composable
+fun NormalCardContent() {
+    Column {
+        Text("Trust Bank PLC.", color = Color.White, fontWeight = FontWeight.Bold)
+        Spacer(modifier = Modifier.height(20.dp))
+        Text("MD HABIBUR RAHMAN", color = Color.White, fontSize = 18.sp)
+        Spacer(modifier = Modifier.weight(1f))
+        Text("Credit Card", color = Color.White.copy(0.7f))
+        Text("See Balance", color = Color.White, fontWeight = FontWeight.Bold)
+    }
+}
+@Composable
+fun LockedCardContent() {
+    Box(modifier = Modifier.fillMaxSize()) {
+
+        // Blur effect
+        Column(
+            modifier = Modifier
+                .matchParentSize()
+                .alpha(0.3f)
+        ) {
+            Text("Trust Bank PLC.", color = Color.White)
+        }
+
+        // Overlay content
+        Column(
+            modifier = Modifier.align(Alignment.Center),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Icon(
+                imageVector = Icons.Default.Lock,
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(40.dp)
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            Text("Locked", color = Color.White, fontWeight = FontWeight.Bold)
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Button(onClick = { /* Unlock action */ }) {
+                Text("Unlock Now")
+            }
+        }
+    }
+}
+@Composable
+fun AgentCardContent() {
+    Column {
+        Text("Trust Bank PLC.", color = Color.White, fontWeight = FontWeight.Bold)
+        Spacer(modifier = Modifier.height(20.dp))
+        Text("Agent User", color = Color.White, fontSize = 18.sp)
+        Spacer(modifier = Modifier.weight(1f))
+        Text("Dual Currency Card", color = Color.White.copy(0.7f))
+        Text("See Balance", color = Color.White, fontWeight = FontWeight.Bold)
+    }
+}
+
+
+@Composable
+fun DepositNowButton(onClick: () -> Unit) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = BrandGreen),
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onClick() }
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            // 🔹 Left Icon
+            Icon(
+                imageVector = Icons.Default.AccountBalanceWallet,
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(36.dp)
+            )
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            // 🔹 Text Section
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "Deposit Now",
+                    color = Color.White,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = "Instant deposit, grow your balance faster 🚀",
+                    color = Color.White.copy(alpha = 0.8f),
+                    fontSize = 13.sp
+                )
+            }
+
+            // 🔹 Right Arrow
+            Icon(
+                imageVector = Icons.Default.ArrowForwardIos,
+                contentDescription = null,
+                tint = Color.White
+            )
+        }
+    }
+}
+
 
 @Composable
 fun DashboardBottomBar(    onHomeClick: () -> Unit,   onLocationClick: () -> Unit) {
@@ -797,6 +938,8 @@ fun QuickActionsMenu(navController: NavController) {
     val menuItems = listOf(
         MenuItemData("Fund Transfer", Icons.Default.SwapHoriz, Screen.FundTransferMethodSelectionScreen.route),
         MenuItemData("Add Money", Icons.Default.AddCard, Screen.AddMoneyMethodSelectionScreen.route),
+        MenuItemData("Packages", Icons.Default.CardGiftcard, Screen.PackageScreen.route),
+        MenuItemData("Add Balance", Icons.Default.MonetizationOn, Screen.AddBalance.passAmount("0.00")),
         MenuItemData("Mobile Recharge", Icons.Default.PhonelinkRing, Screen.MobileRechargeMethodSelectionScreen.route),
         MenuItemData("Credit Card Bill Pay", Icons.Default.CreditCard, Screen.CreditCardSelectionBillPayScreen.route),
         MenuItemData("Account Services", Icons.Default.ManageAccounts, Screen.AccountServiceSelectionScreen.route),
