@@ -1,4 +1,4 @@
-package com.wnapp.trustmoney.ui.transaction
+package com.wnapp.trustmoney.ui
 
 import android.app.Application
 import androidx.compose.foundation.background
@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -30,25 +31,31 @@ import coil.compose.AsyncImage
 import com.wnapp.trustmoney.data.model.PaymentMethodItem
 import com.wnapp.trustmoney.ui.navigation.Screen
 import com.wnapp.trustmoney.viewmodel.AppViewModel
-import com.wnapp.trustmoney.viewmodel.AppViewModelFactory
+import com.wnapp.trustmoney.R
+import com.wnapp.trustmoney.data.model.TransactionType
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddMoneyMethodSelectionScreen(
+fun MethodSelectionScreen(
     navController: NavController,
-    amount: String = ""
-) {
+    amount: String = "",
+    transactionType: String,
+) {1
     val context = LocalContext.current
     val viewModel: AppViewModel = viewModel(
-        factory = AppViewModelFactory(context.applicationContext as Application)
+        factory = AppViewModel.AppViewModelFactory(context.applicationContext as Application)
     )
 
     val brandGreen = Color(0xFF004D40)
     var selectedTabIndex by remember { mutableIntStateOf(0) }
-    val tabs = listOf("Mobile Banking", "Banking")
+
+    // রিসোর্স থেকে স্ট্রিং গেট করা
+    val strMobileBanking = stringResource(id = R.string.mobile_banking)
+    val strBanking = stringResource(id = R.string.banking)
+    val tabs = listOf(strMobileBanking, strBanking)
 
     val allMethods by viewModel.paymentMethods
-    val isLoading by viewModel.isLoading
+    val isLoading = viewModel.isLoading
 
     LaunchedEffect(Unit) {
         viewModel.getPaymentMethods()
@@ -56,23 +63,23 @@ fun AddMoneyMethodSelectionScreen(
 
     val filteredMethods = remember(selectedTabIndex, allMethods) {
         if (selectedTabIndex == 0) {
-            allMethods.filter { it.methodType.lowercase() == "mobile" }
+            allMethods.filter { it.methodType?.lowercase() == "mobile" }
         } else {
-            allMethods.filter { it.methodType.lowercase() == "banking" }
+            allMethods.filter { it.methodType?.lowercase() == "banking" }
         }
     }
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Add Money", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(id = R.string.add_money), color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Default.ArrowBackIosNew, "Back", tint = Color.White, modifier = Modifier.size(20.dp))
                     }
                 },
                 actions = {
-                    IconButton(onClick = { navController.navigate("dashboard") }) {
+                    IconButton(onClick = { navController.navigate(Screen.Home.route) }) {
                         Icon(Icons.Default.Home, "Home", tint = Color.White)
                     }
                 },
@@ -92,7 +99,7 @@ fun AddMoneyMethodSelectionScreen(
                             .navigationBarsPadding(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(text = "Selected Amount", fontSize = 12.sp, color = Color.Gray)
+                        Text(text = stringResource(id = R.string.selected_amount), fontSize = 12.sp, color = Color.Gray)
                         Text(
                             text = "৳ $amount",
                             fontSize = 28.sp,
@@ -138,8 +145,9 @@ fun AddMoneyMethodSelectionScreen(
                 }
             } else {
                 Column(modifier = Modifier.padding(16.dp)) {
+                    // %1$s ফরম্যাট ব্যবহার করে ডাইনামিক স্ট্রিং
                     Text(
-                        text = "Select your preferred ${tabs[selectedTabIndex]}",
+                        text = stringResource(id = R.string.select_preferred_method, tabs[selectedTabIndex]),
                         fontSize = 14.sp,
                         color = Color.Gray,
                         modifier = Modifier
@@ -152,7 +160,7 @@ fun AddMoneyMethodSelectionScreen(
 
                     if (filteredMethods.isEmpty()) {
                         Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
-                            Text("No payment methods found", color = Color.Gray)
+                            Text(stringResource(id = R.string.no_methods_found), color = Color.Gray)
                         }
                     } else {
                         LazyVerticalGrid(
@@ -162,14 +170,48 @@ fun AddMoneyMethodSelectionScreen(
                             modifier = Modifier.weight(1f)
                         ) {
                             items(filteredMethods) { method ->
-                                // এই ফাংশনটি নিচে ডিফাইন করা হয়েছে
                                 PaymentMethodGridItem(method, brandGreen) {
-                                    if(method.methodType == "mobile"){
-                                        navController.navigate(Screen.PaymentSubmitMobile.passAmount(amount))
-                                    }else{
-                                        navController.navigate(Screen.PaymentSubmitBank.passAmount(amount))
+                                    if( transactionType == TransactionType.deposit.toString()) {
+                                        if (method.methodType == "mobile") {
+                                            navController.navigate(
+                                                Screen.PaymentSubmitMobile.passAmountAndProvider(
+                                                    amount,
+                                                    method.id.toString()
+                                                )
+                                            )
+                                        } else {
+                                            navController.navigate(
+                                                Screen.PaymentSubmitBank.passAmountAndProvider(
+                                                    amount,
+                                                    method.id.toString()
+                                                )
+                                            )
+                                        }
+                                    }else if(transactionType == TransactionType.withdraw.toString()){
+                                        if(method.methodType == "mobile") {
+                                            navController.navigate(
+                                                Screen.SendMoneyToMobile.passAmountAndMethod(
+                                                    amount,
+                                                    method.id.toString()
+                                                )
+                                            )
+                                        }else{
+                                            navController.navigate(
+                                                Screen.SendMoneyToBank.passAmountAndMethod(
+                                                    amount,
+                                                    method.id.toString()
+                                                )
+                                            )
+                                        }
+                                    }else if(transactionType == TransactionType.recharge.toString()){
+                                        navController.navigate(
+                                            Screen.MobileRechargeConfirmation.passAmountAndMethod(
+                                                amount,
+                                                method.id.toString()
+                                            )
+                                        )
                                     }
- }
+                                }
                             }
                         }
                     }
@@ -179,7 +221,8 @@ fun AddMoneyMethodSelectionScreen(
     }
 }
 
-// এই ফাংশনটি আপনার ফাইলে থাকা নিশ্চিত করুন
+
+
 @Composable
 fun PaymentMethodGridItem(
     method: PaymentMethodItem,
@@ -208,7 +251,7 @@ fun PaymentMethodGridItem(
         }
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = method.providerName,
+            text = method?.providerName ?: "",
             fontSize = 11.sp,
             fontWeight = FontWeight.Medium,
             color = Color.Black,
@@ -218,14 +261,12 @@ fun PaymentMethodGridItem(
 }
 
 
-
-
 @Preview(showBackground = true, showSystemUi= true)
 @Composable
-fun AddMoneyMethodSelectionScreenPreview(){
+fun MethodSelectionScreenPreview(){
     val navController = rememberNavController()
     val amount: String =""
     MaterialTheme {
-        AddMoneyMethodSelectionScreen(navController = navController, amount)
+        MethodSelectionScreen(navController = navController, amount, TransactionType.deposit.toString())
     }
 }

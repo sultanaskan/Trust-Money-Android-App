@@ -1,10 +1,12 @@
 package com.wnapp.trustmoney.viewmodel
 
+import android.content.Context
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.wnapp.trustmoney.data.local.SessionManager
 import com.wnapp.trustmoney.data.model.CurrencyItem
 import com.wnapp.trustmoney.data.model.LoginCreds
 import com.wnapp.trustmoney.data.model.LoginResponse
@@ -96,6 +98,12 @@ class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
     fun resetLoginStatus(){
         loginStatus.value = null
     }
+    fun logoutUser(context: Context): Boolean{
+        val sm = SessionManager(context)
+        sm.clearSession()
+        return true
+    }
+
 
 
 

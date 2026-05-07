@@ -33,7 +33,6 @@ import com.wnapp.trustmoney.data.model.CurrencyItem
 import com.wnapp.trustmoney.data.model.Package
 import com.wnapp.trustmoney.ui.navigation.Screen
 import com.wnapp.trustmoney.viewmodel.AppViewModel
-import com.wnapp.trustmoney.viewmodel.AppViewModelFactory // নিশ্চিত করুন এটি ইমপোর্ট হয়েছে
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,7 +41,7 @@ fun PackageScreen(navController: NavController) {
 
     // ১. Factory ব্যবহার করে ViewModel ইনিশিয়ালাইজ করা (ক্রাশ রোধের প্রধান উপায়)
     val viewModel: AppViewModel = viewModel(
-        factory = AppViewModelFactory(context.applicationContext as Application)
+        factory = AppViewModel.AppViewModelFactory(context.applicationContext as Application)
     )
 
     val mc = remember { MyCurrency(context) }
@@ -51,7 +50,7 @@ fun PackageScreen(navController: NavController) {
 
     // ২. স্টেটগুলোকে 'by' কিউওয়ার্ড দিয়ে অবজার্ভ করা
     val packages by viewModel.packages
-    val isLoading by viewModel.isLoading
+    val isLoading = viewModel.isLoading
     val usdToBdtRate = 122
     val currencyData = CurrencyItem(mc.getCurrencyId(), mc.getCountryName().toString(), mc.getFlagUrl().toString(), mc.getCurrencyName().toString(), mc.getRateInUsd().toString())
 
@@ -118,7 +117,7 @@ fun PackageCard(item: Package, navController: NavController, currencyData: Curre
             ) {
                 Text(item.packageName, style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold, color = textBlack))
                 IconButton(
-                    onClick = { navController.navigate(Screen.AddMoneyMethodSelectionScreen.passAmount(item.price.toString())) },
+                    onClick = { navController.navigate(Screen.AddBalance.passAmount(item.price.toString())) },
                     modifier = Modifier.size(40.dp).background(Color(0xFFE8F5E9), CircleShape)
                 ) {
                     Icon(Icons.Default.Add, contentDescription = null, tint = Color(0xFF2E7D32))
@@ -207,7 +206,7 @@ fun PackageCard(item: Package, navController: NavController, currencyData: Curre
                     )
                 }
                 Button(
-                    onClick = { navController.navigate(Screen.AddMoneyMethodSelectionScreen.passAmount(item.price.toString())) },
+                    onClick = { navController.navigate(Screen.AddBalance.passAmount(item.price.toString())) },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00C853)),
                     shape = RoundedCornerShape(12.dp)
                 ) {

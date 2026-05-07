@@ -53,20 +53,13 @@ import com.wnapp.trustmoney.viewmodel.AuthViewModel
 
 @SuppressLint("ViewModelConstructorInComposable")
 @Composable
-fun LoginForm(navController: NavController, viewModel: AuthViewModel, context: Context, onSuccess: () -> Unit) {
+fun LoginForm( viewModel: AuthViewModel, context: Context, onSuccess: () -> Unit) {
     var creds by remember { mutableStateOf(LoginCreds()) }
     var isPasswordVisible by remember { mutableStateOf(false) }
 
 
     val loginStatus by viewModel.loginStatus
     val isLoading by viewModel.isLoading
-
-    // সাকসেস হলে ডায়ালগ ওপেন করা
-    LaunchedEffect(loginStatus) {
-        if (loginStatus == "Success") {
-            showOtpDialog = true
-        }
-    }
 
     Column(verticalArrangement = Arrangement.spacedBy(18.dp)) {
         // Email Field

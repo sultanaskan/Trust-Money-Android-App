@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId = "com.wnapp.trustmoney"
-        minSdk = 24
+        minSdk = 25
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -21,6 +21,7 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -61,6 +62,10 @@ dependencies {
 
     // ML Kit & CameraX
     implementation("com.google.mlkit:barcode-scanning:17.3.0")
+    implementation(libs.androidx.compose.foundation.layout)
+    implementation(libs.androidx.foundation)
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.compose.foundation)
     val camerax_version = "1.4.0"
     implementation("androidx.camera:camera-camera2:$camerax_version")
     implementation("androidx.camera:camera-lifecycle:$camerax_version")

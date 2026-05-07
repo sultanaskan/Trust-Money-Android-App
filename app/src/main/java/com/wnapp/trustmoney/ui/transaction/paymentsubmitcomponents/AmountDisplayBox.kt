@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun AmountDisplayBox(amount: String) {
+fun AmountDisplayBox(amount: String, currencyName: String?) {
     Surface(
         modifier = Modifier.fillMaxWidth().height(60.dp),
         shape = RoundedCornerShape(12.dp),
@@ -30,7 +30,7 @@ fun AmountDisplayBox(amount: String) {
     ) {
         Box(contentAlignment = Alignment.CenterStart, modifier = Modifier.padding(horizontal = 16.dp)) {
             Text(
-                text = "SAR $amount",
+                text = "$currencyName $amount",
                 color = Color(0xFF5E6D82),
                 fontSize = 22.sp,
                 fontWeight = FontWeight.ExtraBold

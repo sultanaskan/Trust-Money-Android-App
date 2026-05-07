@@ -19,6 +19,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.wnapp.trustmoney.ui.navigation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,7 +37,7 @@ fun MobileRechargeMethodSelectionScreen(navController: NavController) {
                     }
                 },
                 actions = {
-                    IconButton(onClick = { navController.navigate("home") { popUpTo("home") { inclusive = true } } }) {
+                    IconButton(onClick = { navController.navigate(Screen.Home.route) { popUpTo("home") { inclusive = true } } }) {
                         Icon(Icons.Default.Home, contentDescription = "Home", tint = Color.White)
                     }
                 },
@@ -85,7 +86,7 @@ fun MobileRechargeMethodSelectionScreen(navController: NavController) {
 
             // ৪. নেক্সট বাটন
             Button(
-                onClick = { /* পরবর্তী লজিক */ },
+                onClick = { navController.popBackStack() },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),

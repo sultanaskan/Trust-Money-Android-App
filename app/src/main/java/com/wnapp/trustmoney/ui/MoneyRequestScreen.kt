@@ -1,4 +1,4 @@
-package com.wnapp.trustmoney.ui.transaction
+package com.wnapp.trustmoney.ui
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*

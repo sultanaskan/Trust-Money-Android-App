@@ -19,6 +19,22 @@ class SessionManager(context: Context){
             putString("user_status", user.user.status)
         }.apply()
     }
+    fun savePin(pin: String){
+        prefs.edit().apply{
+            putString("user_pin", pin)
+        }.apply()
+    }
+    fun saveProfileImageUri(uri: String) {
+        prefs.edit().apply{
+            putString("profile_uri", uri)
+        }
+    }
+    fun getProfileImageUri(): String? =  prefs.getString("profile_uri", null)
+
+    fun getPin(): String? = prefs.getString("user_pin",null)
+    fun isPinSet(): Boolean {
+        return getPin() != null
+    }
 
 
 

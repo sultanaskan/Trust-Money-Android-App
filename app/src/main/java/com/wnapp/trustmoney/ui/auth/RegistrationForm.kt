@@ -60,6 +60,7 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.wnapp.trustmoney.R
 import com.wnapp.trustmoney.data.model.CurrencyItem
+import com.wnapp.trustmoney.data.model.LoginCreds
 import com.wnapp.trustmoney.data.model.RegistrationFormData
 import com.wnapp.trustmoney.ui.theme.TBL_Divider_Gray
 import com.wnapp.trustmoney.ui.theme.TBL_Green_Dark
@@ -70,7 +71,6 @@ import java.util.Calendar
 
 @Composable
 fun RegistrationForm(
-    navController: NavController,
     viewModel: AuthViewModel,
     onRegistrationSuccess: () -> Unit
 ) {
@@ -100,8 +100,9 @@ fun RegistrationForm(
     // রেজিস্ট্রেশন সফল হলে নেভিগেশন লজিক
     LaunchedEffect(registrationStatus) {
         if (registrationStatus == "Success") {
-            onRegistrationSuccess()
             viewModel.resetRegistrationStatus()
+            val creds = LoginCreds(formData.email, formData.password)
+            viewModel.loginUser(creds, onSuccess = {onRegistrationSuccess()} )
         }
     }
 
