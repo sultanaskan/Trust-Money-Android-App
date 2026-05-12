@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "723238955217",
+    "project_id": "studio-4167150876-dea3d",
+    "storage_bucket": "studio-4167150876-dea3d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:723238955217:android:236cadc5becd1199b37df0",
+        "android_client_info": {
+          "package_name": "com.wnapp.trustmoney"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-6tbc61GrGLUmjt9sCP7WVLFxJNZFu24"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
