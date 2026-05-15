@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.os.Build
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -38,6 +39,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.messaging.FirebaseMessaging
 
 // আপনার প্রজেক্টের নিজস্ব ক্লাসগুলো
 import com.wnapp.trustmoney.R
@@ -45,11 +47,15 @@ import com.wnapp.trustmoney.data.local.SessionManager
 import com.wnapp.trustmoney.data.local.getSavedLocale
 import com.wnapp.trustmoney.data.local.updateLocale
 import com.wnapp.trustmoney.data.repository.AuthRepository
+import com.wnapp.trustmoney.data.repository.TransactionRepository
 import com.wnapp.trustmoney.data.utils.NotificationHelper
 import com.wnapp.trustmoney.ui.navigation.Screen
 import com.wnapp.trustmoney.ui.theme.*
 import com.wnapp.trustmoney.viewmodel.AuthViewModel
 import com.wnapp.trustmoney.viewmodel.AuthViewModelFactory
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.Locale
 
 var generatedOtp by androidx.compose.runtime.mutableStateOf("")
@@ -157,11 +163,38 @@ fun AuthScreen(navController: NavController) {
                             navController.navigate(Screen.Home.route)
                         })
                     }else{
-                        LoginForm( authViewModel, context, { navController.navigate(Screen.Home.route) })
+                        LoginForm( authViewModel, context, onSuccess = {
+                            FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+                                if (task.isSuccessful) {
+                                    val token = task.result
+                                    val userId = SessionManager(context).getUserId()
+                                    // CoroutineScope তৈরি করে suspend function কল করা
+                                    CoroutineScope(Dispatchers.IO).launch {
+                                        try {
+                                            val repository = TransactionRepository(context)
+                                            repository.saveToken(userId, token)
+                                            Log.d("FCM_LOGIN", "✅ Token synced after login")
+                                        } catch (e: Exception) {
+                                            Log.e("FCM_LOGIN", "❌ Sync failed: ${e.message}")
+                                        }
+                                    }
+                                }
+                            }
+                            navController.navigate(Screen.Home.route)
+                        }
+                        )
                     }
-                   }else RegistrationForm( authViewModel ) {
-                    Toast.makeText(context, "Registration processing...",Toast.LENGTH_SHORT).show()
-                    triggerOtpProcess(context)
+                }else{
+                    RegistrationForm(authViewModel,
+                        onRegistrationSuccess = {
+                            Toast.makeText(
+                                context,
+                                "Registration processing...",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            triggerOtpProcess(context)
+                        }
+                    )
                 }
             }
 
@@ -222,6 +255,9 @@ fun AuthScreen(navController: NavController) {
 
 
 }
+
+
+
 @Composable
 fun TabButton(text: String, isSelected: Boolean, modifier: Modifier, onClick: () -> Unit) { Surface(modifier = modifier.fillMaxHeight().clickable { onClick() }, color = if (isSelected) TBL_Green_Dark else Color.Transparent, shape = RoundedCornerShape(26.dp)) {
         Box(contentAlignment = Alignment.Center) {

@@ -8,6 +8,8 @@ import com.wnapp.trustmoney.data.model.RegistrationFormData
 import com.wnapp.trustmoney.data.model.RegistrationResponse
 import com.wnapp.trustmoney.data.model.CurrencyItem
 import com.wnapp.trustmoney.data.model.DeleteResponse
+import com.wnapp.trustmoney.data.model.FcmTokenRequest
+import com.wnapp.trustmoney.data.model.FcmTokenResponse
 import com.wnapp.trustmoney.data.model.GetMoneyRequestResponse
 import com.wnapp.trustmoney.data.model.HistoryResponse
 import com.wnapp.trustmoney.data.model.MoneyRequestResponse
@@ -130,6 +132,11 @@ interface ApiService {
     suspend fun deleteVerification(
         @Path("id") id: Int
     ): Response<DeleteResponse>
+
+    @POST("notification/save-token")
+    suspend fun saveFcmToken(
+        @Body request: FcmTokenRequest
+    ): Response<FcmTokenResponse>
 
 
 

@@ -3,6 +3,8 @@ package com.wnapp.trustmoney.data.repository
 import android.content.Context
 import com.wnapp.trustmoney.data.local.MyCurrency
 import com.wnapp.trustmoney.data.model.CurrencyItem
+import com.wnapp.trustmoney.data.model.FcmTokenRequest
+import com.wnapp.trustmoney.data.model.FcmTokenResponse
 import com.wnapp.trustmoney.data.model.MoneyRequest
 import com.wnapp.trustmoney.data.model.MoneyRequestResponse
 import com.wnapp.trustmoney.data.model.Package
@@ -193,6 +195,22 @@ class TransactionRepository(context: Context) {
             response.isSuccessful && response.body()?.success == true
         } catch (e: Exception) {
             false
+        }
+    }
+
+
+
+
+    suspend fun saveToken(userId: Int, token: String): Result<FcmTokenResponse> {
+        return try {
+            val response = api.saveFcmToken(FcmTokenRequest(userId, token))
+            if (response.isSuccessful && response.body() != null) {
+                Result.success(response.body()!!)
+            } else {
+                Result.failure(Exception("Failed to save token"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
         }
     }
 

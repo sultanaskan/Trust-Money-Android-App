@@ -1,6 +1,7 @@
 package com.wnapp.trustmoney.ui
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.*
@@ -49,7 +50,7 @@ fun AddMoneyScreen(
     val strSubTitle = stringResource(id = R.string.fast_and_easy_to_add_balance)
     val strContinue = stringResource(id = R.string.continue_btn)
 
-    val usdToBdtRate = 220
+    val usdToBdtRate = 120
     val exchangeRate = ((usdToBdtRate * 1) / (mc.getRateInUsd()?.toDouble() ?: 0.0))
     val intensiveRate = 0.025
 

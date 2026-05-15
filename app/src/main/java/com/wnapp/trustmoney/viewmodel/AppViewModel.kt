@@ -3,6 +3,7 @@ package com.wnapp.trustmoney.viewmodel
 import android.app.Application
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
@@ -28,6 +29,7 @@ import com.wnapp.trustmoney.utils.FileUtil
 import kotlinx.coroutines.launch
 import java.io.File
 import com.wnapp.trustmoney.data.model.VerificationData
+import kotlinx.coroutines.Dispatchers
 
 class AppViewModel(application: Application) : AndroidViewModel(application) {
     private val tranRepo = TransactionRepository(application.applicationContext)
@@ -345,6 +347,9 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
     }
+
+
+
 
 
 

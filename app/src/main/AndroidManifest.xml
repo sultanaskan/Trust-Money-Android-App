@@ -1,10 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-feature android:name="android.hardware.camera" android:required="false" />
-    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.autofocus"
+        android:required="false" />
+
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
@@ -16,6 +23,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.TrustMoney">
+        <service
+            android:name=".service.MyFirebaseService"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

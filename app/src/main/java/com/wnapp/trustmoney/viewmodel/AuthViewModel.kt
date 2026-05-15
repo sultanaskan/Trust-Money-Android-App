@@ -6,12 +6,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.messaging.FirebaseMessaging
 import com.wnapp.trustmoney.data.local.SessionManager
 import com.wnapp.trustmoney.data.model.CurrencyItem
 import com.wnapp.trustmoney.data.model.LoginCreds
 import com.wnapp.trustmoney.data.model.LoginResponse
 import com.wnapp.trustmoney.data.model.RegistrationFormData
 import com.wnapp.trustmoney.data.repository.AuthRepository
+import com.wnapp.trustmoney.data.repository.TransactionRepository
 import kotlinx.coroutines.launch
 
 class AuthViewModel(private val repository: AuthRepository) : ViewModel() {

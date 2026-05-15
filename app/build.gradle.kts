@@ -55,6 +55,8 @@ dependencies {
     // Firebase & Analytics
     implementation(platform("com.google.firebase:firebase-bom:33.9.0"))
     implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-messaging-ktx")
+    implementation("androidx.core:core-ktx:1.13.1")
 
     // Image Loading (Coil)
     implementation("io.coil-kt:coil-svg:2.6.0")

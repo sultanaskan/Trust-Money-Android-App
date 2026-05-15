@@ -334,7 +334,10 @@ fun ProfileSection(userName: String, context: Context, appVM: AppViewModel) {
 
     var isBalanceVisible by remember { mutableStateOf(false) }
     val balance = appVM.wallet?.balance ?: "0.00"
-    val currency = MyCurrency(context).getCurrencyName()
+    val myCurrency = MyCurrency(context);
+    val currency = myCurrency.getCurrencyName()
+    val usdRate = myCurrency.getRateInUsd();
+    val bdtBalance = balance.toDouble() * ( 120 / usdRate!!.toDouble() ) ;
 
     // background color এর পরিবর্তে SVG ব্যবহার করার জন্য Box ব্যবহার করা হয়েছে
     Box(
@@ -426,7 +429,7 @@ fun ProfileSection(userName: String, context: Context, appVM: AppViewModel) {
                         label = "BalanceToggle"
                     ) { visible ->
                         Text(
-                            text = if (visible) "$balance $currency" else "Tap for Balance",
+                            text = if (visible) "$bdtBalance BDT" else "Tap for Balance",
                             color = Color.White,
                             fontSize = 15.sp,
                             fontWeight = FontWeight.Bold
